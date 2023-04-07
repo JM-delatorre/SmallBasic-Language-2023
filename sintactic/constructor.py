@@ -1,27 +1,21 @@
 import copy
+import os
 
 INICIO = "INICIO"
-VACIO = "ε"
+VACIO = "&"
 FINAL = "$"
 PRIMEROS = {}
 SIGUIENTES = {}
 PREDICCION = {}
 
-NO_TERMINALS = ["A", "B", "C"]
-
 grammar = {
+    "INICIO": [["A"]],
     "A": [["B", "C"], ["ant", "A", "all"]],
-    "B": [["big", "C"],["bus", "A", "boss"],["ε"]], 
+    "B": [["big", "C"],["bus", "A", "boss"],["&"]], 
     "C": [["cat"],["cow"]]
 }
 
-
-# reglasTemp = {
-#     "A": [["A", ["A", "all"]],["B",["A", "boss"]] ]
-#     "B":
-#     "C": [["A",["C"]], ["B", ["C"]]]
-# }
-
+NO_TERMINALS = grammar.keys()
 # NO_TERMINALS = ["S","A", "B", "C", "D"]
 
 # grammar = {
@@ -44,10 +38,7 @@ grammar = {
 #     "D": [["seis"], ["ε"]]
 # }
 
-
-#GET ALL PRIMEROS
-#--TODO-- MIRAR CUESTION DE RECURION DEPTH
-
+# ALL FUNCTIONS
 def getPRIMEROS(rule:list):
     if (rule == [VACIO]):
         return [VACIO]
@@ -76,24 +67,12 @@ def getPRIMEROS(rule:list):
                     return A1
         return A1
 
-for no_terminal in grammar.keys():
-    allRules = grammar[no_terminal] # all rules of one no_terminal 
-    PRIMEROS[no_terminal] = []
-    for each_rule in allRules: 
-        temp = getPRIMEROS(each_rule)
-        if temp != None:
-            if len(PRIMEROS[no_terminal]) == 0:
-                PRIMEROS[no_terminal] =  temp
-            else:
-                PRIMEROS[no_terminal].extend(temp)
-
-# GET SIGUIENTES
 def getSIGUIENTES():
-    SIGUIENTES["A"] = [FINAL]
+    SIGUIENTES["INICIO"] = [FINAL]
     preSig = copy.deepcopy(SIGUIENTES)
-    for no_terminal in grammar.keys():
+    for no_terminal in NO_TERMINALS:
         a = no_terminal
-        for no_terminal2 in grammar.keys():
+        for no_terminal2 in NO_TERMINALS:
             b = no_terminal2
             for rule in grammar[b]:
                 myLen = len(rule)
@@ -130,13 +109,70 @@ def getPREDICCION(rule, noterminal):
     else:
         return x
 
-getSIGUIENTES()
-print(PRIMEROS)
-print(SIGUIENTES)
-
-for no_terminal in grammar.keys():
+# GET PRIMEROS
+for no_terminal in NO_TERMINALS:
     allRules = grammar[no_terminal] # all rules of one no_terminal 
+    PRIMEROS[no_terminal] = []
     for each_rule in allRules: 
-        PREDICCION["".join(each_rule)] = getPREDICCION(each_rule, no_terminal)
+        temp = getPRIMEROS(each_rule)
+        if temp != None:
+            if len(PRIMEROS[no_terminal]) == 0:
+                PRIMEROS[no_terminal] =  temp
+            else:
+                PRIMEROS[no_terminal].extend(temp)
 
-print(PREDICCION)
+getSIGUIENTES()
+
+#GET PREDICCION
+PREDICCION = copy.deepcopy(grammar)
+for no_terminal in NO_TERMINALS:
+    allRules = grammar[no_terminal] # all rules of one no_terminal 
+    for i in range(len(allRules)):
+        PREDICCION[no_terminal][i] = getPREDICCION(allRules[i], no_terminal)
+
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
+routeFile = dir_path + "/parser.py"
+fileSyntactic = open(routeFile, "w")
+fileSyntactic.write('# TODO ADD github \n')
+fileSyntactic.write('# TODO ADD LEXIC \n\n')
+
+fileSyntactic.write('''def errorSin(mylist):
+    l = ",".join(mylist)
+    print(f"[{token.row}:{token.col}] Error sintactico: Se encontro: {token.id}; se esperaba: {l}")\n
+''')
+
+fileSyntactic.write('''def emparejar(item):
+    if token.id == item:
+        ITERATOR += 1
+        token = allmytokens[ITERATOR]
+    else:
+        errorSin([item])\n
+''')
+
+def createFunctions(): 
+    allFunctions = ""
+    for item in NO_TERMINALS:
+        listaAEntregar = set()
+        allFunctions += f"def {item}():\n"
+        for iconjuntos in range(len(PREDICCION[item])): #itarate in sets
+            listaAEntregar.update(PREDICCION[item][iconjuntos])
+            if (iconjuntos == 0):
+                allFunctions += f"\tif token.id in {PREDICCION[item][iconjuntos]}:\n"
+            else:
+                allFunctions += f"\telif token.id in {PREDICCION[item][iconjuntos]}:\n"
+                
+            actualRule = grammar[item][iconjuntos]            
+            for itemRegla in actualRule:
+                if itemRegla in NO_TERMINALS:
+                    allFunctions += f"\t\t{itemRegla}()\n"
+                else:
+                    allFunctions += f"\t\temparejar(\"{itemRegla}\")\n"
+        allFunctions += f"\telse:\n"
+        allFunctions += f"\t\terrorSin({list(listaAEntregar)})\n"
+        allFunctions += f"\tprint(\'esta es mi funcion {item}\')\n\n"
+    return allFunctions
+
+fileSyntactic.write(createFunctions())
+fileSyntactic.close()
+
