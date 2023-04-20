@@ -1,0 +1,3 @@
+Sub función(dato)
+  TextWindow.WriteLine(dato)
+EndSub

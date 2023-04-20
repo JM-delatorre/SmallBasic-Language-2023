@@ -1,7 +1,7 @@
 import re
 
-global allmytokens
 allmytokens = []
+global token
 ITERATOR = 0
 
 class Token():
@@ -58,51 +58,42 @@ def lexer(l,r):
     else:
         finalPattern = "|".join(allrex) 
         finalValue = None
-        for token in re.finditer(finalPattern, l):
-            col = token.start() + 1 # aumentamos uno porque el inidice empieza en 1 no en 0
-            if token.lastgroup == "comment":
+        for tkn in re.finditer(finalPattern, l):
+            col = tkn.start() + 1 # aumentamos uno porque el inidice empieza en 1 no en 0
+            if tkn.lastgroup == "comment":
                 continue
-            elif token.lastgroup == "string":
-                value = token.group()
+            elif tkn.lastgroup == "string":
+                value = tkn.group()
                 if value.lower() == '"true"':
                     finalValue = Token("True", r, col)
                 elif value.lower() == '"false"':
                     finalValue = Token("False", r, col)
                 else:
                     finalValue = Token("tkn_text", r, col, value[1:-1])
-            elif token.lastgroup == "number":
-                finalValue = Token("tkn_number", r, col, token.group())
-            elif token.lastgroup == "id":
-                if token.group() in keywords:
-                    finalValue = Token(token.group(), r, col)
+            elif tkn.lastgroup == "number":
+                finalValue = Token("tkn_number", r, col, tkn.group())
+            elif tkn.lastgroup == "id":
+                if tkn.group() in keywords:
+                    finalValue = Token(tkn.group(), r, col)
                 else:
-                    finalValue = Token("id", r, col, token.group())
-            elif token.lastgroup == "compOp":
-                tknId = "tkn_" + opOrSym[token.group()]
+                    finalValue = Token("id", r, col, tkn.group())
+            elif tkn.lastgroup == "compOp":
+                tknId = "tkn_" + opOrSym[tkn.group()]
                 finalValue = Token(tknId, r, col)
             else:
-                if token.group() in opOrSym.keys():
-                    tknId = "tkn_" + opOrSym[token.group()]
+                if tkn.group() in opOrSym.keys():
+                    tknId = "tkn_" + opOrSym[tkn.group()]
                     finalValue = Token(tknId, r, col)
                 else:
-                    allmytokens.append(Token("ERROR",r, col)) 
+                    print(Token("ERROR",r, col)) 
                     return "ERROR"
             allmytokens.append(finalValue) 
 
 
 rows = 1
-f = open("input.txt", 'r')
 while True:
     try:
-        #line = input()
-        # PARA PRUEBAS PERSONALES
-        line = f.readline()
-        if line == '':
-            print("Acabo el archivo")
-            lexer('EOF', rows)
-            break
-        line = line[0:-1] if line[-1] == '\n' else line
-        print(line)
+        line = input()
         x = lexer(line, rows)
         if x == "Error":
             break
@@ -110,3 +101,6 @@ while True:
     except EOFError: #Acaba cuando no hay mas entradas del usuario
         lexer('EOF', rows)
         break
+
+#------------------------------------------------
+

@@ -1,5 +1,6 @@
 import copy
 import os
+from mygrammar import grammar 
 
 INICIO = "INICIO"
 VACIO = "&"
@@ -8,12 +9,6 @@ PRIMEROS = {}
 SIGUIENTES = {}
 PREDICCION = {}
 
-grammar = {
-    "INICIO": [["A"]],
-    "A": [["B", "C"], ["ant", "A", "all"]],
-    "B": [["big", "C"],["bus", "A", "boss"],["&"]], 
-    "C": [["cat"],["cow"]]
-}
 
 NO_TERMINALS = grammar.keys()
 # NO_TERMINALS = ["S","A", "B", "C", "D"]
@@ -131,11 +126,18 @@ for no_terminal in NO_TERMINALS:
         PREDICCION[no_terminal][i] = getPREDICCION(allRules[i], no_terminal)
 
 
+#WRITE THINGS FOR LEXIC
+dir_path_lex = os.path.dirname(os.path.realpath(__file__))
+routeFile_lex = dir_path_lex + "/../lexic/lexicForSintactic.py"
+fileLexic = open(routeFile_lex,'r')
+all_lexic = fileLexic.read()
+
 dir_path = os.path.dirname(os.path.realpath(__file__))
 routeFile = dir_path + "/parser.py"
 fileSyntactic = open(routeFile, "w")
+
 fileSyntactic.write('# TODO ADD github \n')
-fileSyntactic.write('# TODO ADD LEXIC \n\n')
+fileSyntactic.write(all_lexic)
 
 fileSyntactic.write('''def errorSin(mylist):
     l = ",".join(mylist)
@@ -143,6 +145,7 @@ fileSyntactic.write('''def errorSin(mylist):
 ''')
 
 fileSyntactic.write('''def emparejar(item):
+    global token
     if token.id == item:
         ITERATOR += 1
         token = allmytokens[ITERATOR]
@@ -170,9 +173,10 @@ def createFunctions():
                     allFunctions += f"\t\temparejar(\"{itemRegla}\")\n"
         allFunctions += f"\telse:\n"
         allFunctions += f"\t\terrorSin({list(listaAEntregar)})\n"
-        allFunctions += f"\tprint(\'esta es mi funcion {item}\')\n\n"
     return allFunctions
 
+
 fileSyntactic.write(createFunctions())
+fileSyntactic.write('\nprint(allmytokens)')
 fileSyntactic.close()
 

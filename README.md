@@ -3,4 +3,6 @@ Repositorio para guardar las entregas de Lenguajes de programacion con Microsoft
 
     /
     ├─ lexic/
-    ├─ syntax/
+    ├─ sintactic/
+
+Para pruebas pasar los casos de pruebas como pipes <
