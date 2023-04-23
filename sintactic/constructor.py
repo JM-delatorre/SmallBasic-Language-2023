@@ -64,7 +64,6 @@ def getPRIMEROS(rule:list):
 
 def getSIGUIENTES():
     SIGUIENTES["INICIO"] = [FINAL]
-    preSig = copy.deepcopy(SIGUIENTES)
     for no_terminal in NO_TERMINALS:
         a = no_terminal
         for no_terminal2 in NO_TERMINALS:
@@ -75,8 +74,11 @@ def getSIGUIENTES():
                     if rule[i] == a:
                         if i == myLen - 1:
                             if a != b:
-                                if a not in SIGUIENTES.keys():
+                                if not (a in SIGUIENTES.keys()):
                                     SIGUIENTES[a] = []
+                                print(rule)
+                                print(a, b)
+                                print(SIGUIENTES)
                                 SIGUIENTES[a].extend(SIGUIENTES[b])
                         else:
                             if rule[i+1] not in NO_TERMINALS:
