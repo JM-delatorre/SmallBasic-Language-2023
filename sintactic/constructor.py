@@ -118,10 +118,9 @@ for no_terminal in NO_TERMINALS:
             else:
                 PRIMEROS[no_terminal].extend(temp)
 
-getSIGUIENTES()
+SIGUIENTES = getSIGUIENTES()
 
 #GET PREDICCION
-PREDICCION = copy.deepcopy(grammar)
 for no_terminal in NO_TERMINALS:
     allRules = grammar[no_terminal] # all rules of one no_terminal 
     for i in range(len(allRules)):
@@ -138,16 +137,46 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 routeFile = dir_path + "/parser.py"
 fileSyntactic = open(routeFile, "w")
 
-fileSyntactic.write('# TODO ADD github \n')
+fileSyntactic.write('# https://github.com/JM-delatorre/SmallBasic-Language-2023\n')
 fileSyntactic.write(all_lexic)
 
 fileSyntactic.write('''def errorSin(mylist):
-    l = ",".join(mylist)
-    print(f"[{token.row}:{token.col}] Error sintactico: Se encontro: {token.id}; se esperaba: {l}")\n
+    for i in range(len(mylist)):
+        mylist[i] = conv(mylist[i])
+    mylist.sort()
+    l = "', '".join(mylist)
+    l = "'" + l + "'." 
+    if token.id == "$":
+        print(f"[{token.row}:{token.col}] Error sintactico: Se encontro el final del archivo; se esperaba: {l}")\n
+    else:
+        print(f"[{token.row}:{token.col}] Error sintactico: Se encontro: '{token.lex}'; se esperaba: {l}")\n
+    exit()
+''')
+
+
+fileSyntactic.write('''def conv(tkn):
+    if tkn == "$":
+        return "EOF"
+    elif tkn == "id":
+        return "Identificador"
+    elif tkn == "tkn_number":
+        return "Numero"
+    elif tkn == "tkn_text":
+        return "Texto"
+    elif tkn == "True":
+        return "Verdadero"
+    elif tkn == "False":
+        return "Falso" 
+    elif "tkn_" in tkn:
+        tkn = tkn.replace(\"tkn_\", \"\")
+        return list(opOrSym.keys())[list(opOrSym.values()).index(tkn)]
+    else:
+        return tkn
 ''')
 
 fileSyntactic.write('''def emparejar(item):
     global token
+    global ITERATOR
     if token.id == item:
         ITERATOR += 1
         token = allmytokens[ITERATOR]
@@ -171,6 +200,8 @@ def createFunctions():
             for itemRegla in actualRule:
                 if itemRegla in NO_TERMINALS:
                     allFunctions += f"\t\t{itemRegla}()\n"
+                elif itemRegla == '&':
+                    allFunctions += f"\t\treturn\n"
                 else:
                     allFunctions += f"\t\temparejar(\"{itemRegla}\")\n"
         allFunctions += f"\telse:\n"
@@ -179,6 +210,11 @@ def createFunctions():
 
 
 fileSyntactic.write(createFunctions())
-fileSyntactic.write('\nprint(allmytokens)')
+fileSyntactic.write('\ntoken = allmytokens[ITERATOR]')
+fileSyntactic.write('\nINICIO()')
+fileSyntactic.write("\nif token.id != \"$\": \n")
+fileSyntactic.write("\terrorSin([\"$\"]) \n")
+fileSyntactic.write("else: \n")
+fileSyntactic.write("\tprint(\"El analisis sintactico ha finalizado exitosamente.\", end=' ') \n")
 fileSyntactic.close()
 

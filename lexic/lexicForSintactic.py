@@ -65,25 +65,25 @@ def lexer(l,r):
             elif tkn.lastgroup == "string":
                 value = tkn.group()
                 if value.lower() == '"true"':
-                    finalValue = Token("True", r, col)
+                    finalValue = Token("True", r, col, 'Verdadero')
                 elif value.lower() == '"false"':
-                    finalValue = Token("False", r, col)
+                    finalValue = Token("False", r, col, 'Falso')
                 else:
                     finalValue = Token("tkn_text", r, col, value[1:-1])
             elif tkn.lastgroup == "number":
                 finalValue = Token("tkn_number", r, col, tkn.group())
             elif tkn.lastgroup == "id":
                 if tkn.group() in keywords:
-                    finalValue = Token(tkn.group(), r, col)
+                    finalValue = Token(tkn.group(), r, col, tkn.group())
                 else:
                     finalValue = Token("id", r, col, tkn.group())
             elif tkn.lastgroup == "compOp":
                 tknId = "tkn_" + opOrSym[tkn.group()]
-                finalValue = Token(tknId, r, col)
+                finalValue = Token(tknId, r, col, tkn.group())
             else:
                 if tkn.group() in opOrSym.keys():
                     tknId = "tkn_" + opOrSym[tkn.group()]
-                    finalValue = Token(tknId, r, col)
+                    finalValue = Token(tknId, r, col, tkn.group())
                 else:
                     print(Token("ERROR",r, col)) 
                     return "ERROR"
