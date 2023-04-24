@@ -126,7 +126,7 @@ for no_terminal in NO_TERMINALS:
     for i in range(len(allRules)):
         PREDICCION[no_terminal][i] = getPREDICCION(allRules[i], no_terminal)
 
-
+print(PREDICCION)
 #WRITE THINGS FOR LEXIC
 dir_path_lex = os.path.dirname(os.path.realpath(__file__))
 routeFile_lex = dir_path_lex + "/../lexic/lexicForSintactic.py"

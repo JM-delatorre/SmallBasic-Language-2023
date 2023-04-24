@@ -147,271 +147,313 @@ def emparejar(item):
 
 def INICIO():
 	if token.id in ['Array', 'For', 'Goto', 'If', 'Program', 'Stack', 'Sub', 'TextWindow', 'While', 'id']:
-		sentencias()
+		sentences()
 	else:
-		errorSin(['Array', 'Goto', 'Stack', 'While', 'Sub', 'TextWindow', 'id', 'If', 'Program', 'For'])
-def sentencias():
+		errorSin(['Sub', 'If', 'For', 'id', 'Array', 'Goto', 'Program', 'TextWindow', 'While', 'Stack'])
+def sentences():
 	if token.id in ['Array', 'For', 'Goto', 'If', 'Program', 'Stack', 'Sub', 'TextWindow', 'While', 'id']:
-		sentencia()
-		sigue()
+		sentence()
+		temp_sentences()
 	else:
-		errorSin(['Array', 'Goto', 'Stack', 'While', 'Sub', 'TextWindow', 'id', 'If', 'Program', 'For'])
-def sigue():
+		errorSin(['Sub', 'If', 'For', 'id', 'Array', 'Goto', 'Program', 'TextWindow', 'While', 'Stack'])
+def temp_sentences():
 	if token.id in ['Array', 'For', 'Goto', 'If', 'Program', 'Stack', 'Sub', 'TextWindow', 'While', 'id']:
-		sentencias()
+		sentences()
 	elif token.id in ['$', 'Else', 'ElseIf', 'EndFor', 'EndIf', 'EndSub', 'EndWhile']:
 		return
 	else:
-		errorSin(['ElseIf', 'EndFor', 'Array', 'EndWhile', 'Goto', 'Stack', 'While', 'Sub', 'TextWindow', 'id', '$', 'Else', 'EndIf', 'EndSub', 'If', 'Program', 'For'])
-def sentencia():
+		errorSin(['Sub', 'ElseIf', 'If', 'EndIf', 'For', '$', 'EndFor', 'id', 'EndWhile', 'Array', 'Goto', 'Program', 'TextWindow', 'Else', 'While', 'EndSub', 'Stack'])
+def sentence():
 	if token.id in ['If']:
-		sentencia_condicional_if()
+		if_conditional_sentence()
 	elif token.id in ['While']:
-		sentencia_while()
+		while_sentence()
 	elif token.id in ['For']:
-		sentencia_for()
+		for_sentence()
 	elif token.id in ['id']:
-		sentencia_de_asignacion()
+		assign_sentence()
 	elif token.id in ['TextWindow']:
-		sentencia_escritura()
+		write_sentence()
 	elif token.id in ['Sub']:
-		declarar_subrutina()
+		sub_declare()
 	elif token.id in ['Goto']:
-		ir_a_etiqueta()
+		go_label()
 	elif token.id in ['Array', 'Program', 'Stack']:
-		funcion_built_in()
+		builtin_declare()
 	else:
-		errorSin(['Array', 'Goto', 'While', 'id', 'Sub', 'TextWindow', 'Stack', 'If', 'Program', 'For'])
-def funcion_built_in():
-	if token.id in ['Stack']:
+		errorSin(['Sub', 'If', 'For', 'id', 'TextWindow', 'Goto', 'Array', 'Program', 'While', 'Stack'])
+def builtin_declare():
+	if token.id in ['Program']:
+		emparejar("Program")
+		builtin_block()
+	elif token.id in ['Stack']:
 		emparejar("Stack")
-		emparejar("tkn_period")
-		emparejar("id")
-		emparejar("tkn_left_paren")
-		variable()
-		parametros_built_in()
-		emparejar("tkn_right_paren")
+		builtin_block()
 	elif token.id in ['Array']:
 		emparejar("Array")
-		emparejar("tkn_period")
-		emparejar("id")
-		emparejar("tkn_left_paren")
-		variable()
-		parametros_built_in()
-		emparejar("tkn_right_paren")
-	elif token.id in ['Program']:
-		emparejar("Program")
-		emparejar("tkn_period")
-		emparejar("id")
-		emparejar("tkn_left_paren")
-		funcion_built_in1()
+		builtin_block()
 	else:
-		errorSin(['Program', 'Array', 'Stack'])
-def parametros_built_in():
-	if token.id in ['tkn_comma']:
-		emparejar("tkn_comma")
-		opcion_parametro()
-		parametros_built_in()
+		errorSin(['Array', 'Program', 'Stack'])
+def builtin_block():
+	if token.id in ['tkn_period']:
+		emparejar("tkn_period")
+		emparejar("id")
+		emparejar("tkn_left_paren")
+		arguments()
+		emparejar("tkn_right_paren")
+	else:
+		errorSin(['tkn_period'])
+def arguments():
+	if token.id in ['Array', 'False', 'Program', 'Stack', 'True', 'id', 'tkn_comma', 'tkn_number', 'tkn_right_paren', 'tkn_text']:
+		param_option()
+		builtin_param()
 	elif token.id in ['tkn_right_paren']:
 		return
 	else:
-		errorSin(['tkn_right_paren', 'tkn_comma'])
-def opcion_parametro():
-	if token.id in ['False', 'True', 'id', 'tkn_number', 'tkn_text']:
-		variable()
+		errorSin(['tkn_text', 'False', 'True', 'tkn_comma', 'id', 'tkn_number', 'Array', 'tkn_right_paren', 'Program', 'Stack'])
+def builtin_param():
+	if token.id in ['tkn_comma']:
+		emparejar("tkn_comma")
+		param_option()
+		builtin_param()
+	elif token.id in ['tkn_right_paren']:
+		return
+	else:
+		errorSin(['tkn_comma', 'tkn_right_paren'])
+def param_option():
+	if token.id in ['Array', 'False', 'Program', 'Stack', 'True', 'id', 'tkn_number', 'tkn_text']:
+		myvar()
 	elif token.id in ['tkn_comma', 'tkn_right_paren']:
 		return
 	else:
-		errorSin(['tkn_right_paren', 'False', 'id', 'tkn_text', 'tkn_comma', 'True', 'tkn_number'])
-def sentencia_de_asignacion():
+		errorSin(['tkn_text', 'False', 'True', 'tkn_comma', 'id', 'tkn_number', 'Array', 'tkn_right_paren', 'Program', 'Stack'])
+def assign_sentence():
 	if token.id in ['id']:
 		emparejar("id")
-		sentencia_de_asignacion1()
+		assign_sentence1()
 	else:
 		errorSin(['id'])
-def continuar_array():
+def array_continue():
 	if token.id in ['tkn_left_brac']:
 		emparejar("tkn_left_brac")
-		variable()
+		myvar()
 		emparejar("tkn_right_brac")
 		emparejar("tkn_equals")
-		variable()
+		myvar()
 	elif token.id in ['tkn_equals']:
 		emparejar("tkn_equals")
-		variable()
+		expr()
 	elif token.id in ['$', 'Array', 'Else', 'ElseIf', 'EndFor', 'EndIf', 'EndSub', 'EndWhile', 'For', 'Goto', 'If', 'Program', 'Stack', 'Sub', 'TextWindow', 'While', 'id']:
 		return
 	else:
-		errorSin(['tkn_left_brac', 'tkn_equals', 'Else', 'Sub', 'TextWindow', 'ElseIf', 'EndWhile', 'Goto', 'EndSub', 'Stack', 'While', 'id', 'EndIf', 'Program', 'Array', '$', 'If', 'EndFor', 'For'])
-def otra_sentencia():
+		errorSin(['ElseIf', 'id', 'tkn_equals', 'Stack', 'Sub', 'EndIf', 'EndWhile', '$', 'EndFor', 'For', 'Array', 'If', 'tkn_left_brac', 'TextWindow', 'Goto', 'Program', 'Else', 'While', 'EndSub'])
+def temp_sentence():
 	if token.id in ['TextWindow']:
 		emparejar("TextWindow")
 		emparejar("tkn_period")
 		emparejar("id")
 		emparejar("tkn_left_paren")
 		emparejar("tkn_right_paren")
-	elif token.id in ['False', 'True', 'id', 'tkn_left_paren', 'tkn_minus', 'tkn_number', 'tkn_text']:
-		expresion()
+	elif token.id in ['Array', 'False', 'Program', 'Stack', 'TextWindow', 'True', 'id', 'tkn_left_paren', 'tkn_minus', 'tkn_number', 'tkn_text']:
+		expr()
 	elif token.id in ['Array', 'Program', 'Stack']:
-		funcion_built_in()
+		builtin_declare()
 	else:
-		errorSin(['tkn_left_paren', 'Array', 'tkn_minus', 'False', 'Stack', 'id', 'TextWindow', 'tkn_text', 'Program', 'True', 'tkn_number'])
-def sentencia_escritura():
+		errorSin(['tkn_text', 'tkn_minus', 'False', 'True', 'id', 'tkn_left_paren', 'TextWindow', 'Array', 'Program', 'tkn_number', 'Stack'])
+def write_sentence():
 	if token.id in ['TextWindow']:
 		emparejar("TextWindow")
 		emparejar("tkn_period")
 		emparejar("id")
 		emparejar("tkn_left_paren")
-		sentencia_escritura1()
+		write_sentence1()
 	else:
 		errorSin(['TextWindow'])
-def sentencia_condicional_if():
+def if_conditional_sentence():
 	if token.id in ['If']:
 		emparejar("If")
 		emparejar("tkn_left_paren")
-		expresion_condicion()
+		expr_conditional()
 		emparejar("tkn_right_paren")
 		emparejar("Then")
-		sentencias()
-		condicional_ElseIf()
-		condicional_Else()
+		sentences()
+		elseif_conditional()
+		else_conditional()
 		emparejar("EndIf")
 	else:
 		errorSin(['If'])
-def condicional_ElseIf():
+def elseif_conditional():
 	if token.id in ['ElseIf']:
 		emparejar("ElseIf")
 		emparejar("tkn_left_paren")
-		expresion_condicion()
+		expr_conditional()
 		emparejar("tkn_right_paren")
 		emparejar("Then")
-		sentencias()
-		condicional_ElseIf()
+		sentences()
+		elseif_conditional()
 	elif token.id in ['Else', 'EndIf']:
 		return
 	else:
-		errorSin(['ElseIf', 'EndIf', 'Else'])
-def condicional_Else():
+		errorSin(['EndIf', 'Else', 'ElseIf'])
+def else_conditional():
 	if token.id in ['Else']:
 		emparejar("Else")
-		sentencias()
+		sentences()
 	elif token.id in ['EndIf']:
 		return
 	else:
 		errorSin(['EndIf', 'Else'])
-def etiqueta():
+def label():
 	if token.id in ['id']:
 		emparejar("id")
 		emparejar("tkn_colon")
 	else:
 		errorSin(['id'])
-def ir_a_etiqueta():
+def go_label():
 	if token.id in ['Goto']:
 		emparejar("Goto")
 		emparejar("id")
 	else:
 		errorSin(['Goto'])
-def sentencia_while():
+def while_sentence():
 	if token.id in ['While']:
 		emparejar("While")
 		emparejar("tkn_left_paren")
-		expresion_condicion()
+		expr_conditional()
 		emparejar("tkn_right_paren")
-		sentencias()
+		sentences()
 		emparejar("EndWhile")
 	else:
 		errorSin(['While'])
-def sentencia_for():
+def for_sentence():
 	if token.id in ['For']:
 		emparejar("For")
-		emparejar("id")
+		myvar()
 		emparejar("tkn_equals")
-		emparejar("tkn_number")
+		expr()
 		emparejar("To")
-		emparejar("tkn_number")
-		sentencia_for1()
+		expr_conditional()
+		for_sentence1()
 	else:
 		errorSin(['For'])
-def declarar_subrutina():
+def sub_declare():
 	if token.id in ['Sub']:
 		emparejar("Sub")
 		emparejar("id")
-		contenido_subrutina()
+		sub_block()
 		emparejar("EndSub")
 	else:
 		errorSin(['Sub'])
-def contenido_subrutina():
+def sub_block():
 	if token.id in ['Array', 'For', 'Goto', 'If', 'Program', 'Stack', 'TextWindow', 'While', 'id']:
-		sentencias_subrutina()
+		sub_sentences()
 	elif token.id in ['EndSub']:
 		return
 	else:
-		errorSin(['Array', 'Goto', 'Stack', 'While', 'id', 'TextWindow', 'EndSub', 'If', 'Program', 'For'])
-def sentencias_subrutina():
+		errorSin(['If', 'For', 'id', 'Array', 'Goto', 'Program', 'TextWindow', 'While', 'EndSub', 'Stack'])
+def sub_sentences():
 	if token.id in ['Array', 'For', 'Goto', 'If', 'Program', 'Stack', 'TextWindow', 'While', 'id']:
-		sentencia_sub()
-		sigue()
+		sub_sentence()
+		temp_sentences()
 	else:
-		errorSin(['Array', 'Goto', 'Stack', 'While', 'id', 'TextWindow', 'If', 'Program', 'For'])
-def sentencia_sub():
+		errorSin(['If', 'For', 'id', 'Array', 'Goto', 'Program', 'TextWindow', 'While', 'Stack'])
+def sub_sentence():
 	if token.id in ['If']:
-		sentencia_condicional_if()
+		if_conditional_sentence()
 	elif token.id in ['While']:
-		sentencia_while()
+		while_sentence()
 	elif token.id in ['For']:
-		sentencia_for()
+		for_sentence()
 	elif token.id in ['id']:
-		sentencia_de_asignacion()
+		assign_sentence()
 	elif token.id in ['TextWindow']:
-		sentencia_escritura()
+		write_sentence()
 	elif token.id in ['Goto']:
-		ir_a_etiqueta()
+		go_label()
 	elif token.id in ['Array', 'Program', 'Stack']:
-		funcion_built_in()
+		builtin_declare()
 	else:
-		errorSin(['Array', 'Goto', 'While', 'id', 'Stack', 'TextWindow', 'If', 'Program', 'For'])
-def expresion():
-	if token.id in ['tkn_minus']:
+		errorSin(['If', 'For', 'id', 'TextWindow', 'Goto', 'Array', 'Program', 'While', 'Stack'])
+def expr():
+	if token.id in ['tkn_left_paren']:
+		emparejar("tkn_left_paren")
+		expr()
+		emparejar("tkn_right_paren")
+		expr1()
+	elif token.id in ['TextWindow']:
+		write_sentence()
+	elif token.id in ['tkn_minus']:
 		emparejar("tkn_minus")
-		expresion()
-	elif token.id in ['False', 'True', 'id', 'tkn_number', 'tkn_text']:
-		variable()
-		expresion1()
+		expr()
+	elif token.id in ['Array', 'False', 'Program', 'Stack', 'True', 'id', 'tkn_number', 'tkn_text']:
+		myvar()
+		expr1()
+	else:
+		errorSin(['tkn_text', 'tkn_minus', 'False', 'True', 'id', 'tkn_left_paren', 'TextWindow', 'Array', 'Program', 'tkn_number', 'Stack'])
+def expr1():
+	if token.id in ['tkn_diff', 'tkn_div', 'tkn_geq', 'tkn_greater', 'tkn_leq', 'tkn_less', 'tkn_minus', 'tkn_plus', 'tkn_times']:
+		op()
+		expr()
+	elif token.id in ['And', 'Or']:
+		conector()
+		expr()
+	elif token.id in ['$', 'Array', 'Else', 'ElseIf', 'EndFor', 'EndIf', 'EndSub', 'EndWhile', 'For', 'Goto', 'If', 'Program', 'Stack', 'Sub', 'TextWindow', 'To', 'While', 'id', 'tkn_right_paren']:
+		return
+	else:
+		errorSin(['tkn_less', 'tkn_plus', 'ElseIf', 'id', 'Or', 'tkn_div', 'While', 'tkn_greater', 'Stack', 'Sub', 'EndIf', 'EndWhile', '$', 'EndFor', 'For', 'Array', 'And', 'If', 'tkn_right_paren', 'TextWindow', 'Goto', 'Program', 'Else', 'tkn_diff', 'tkn_geq', 'To', 'tkn_minus', 'tkn_times', 'tkn_leq', 'EndSub'])
+def expr_conditional():
+	if token.id in ['Array', 'Program', 'Stack']:
+		builtin_declare()
+		expr_conditional()
+	elif token.id in ['tkn_diff', 'tkn_div', 'tkn_equals', 'tkn_geq', 'tkn_greater', 'tkn_leq', 'tkn_less', 'tkn_minus', 'tkn_plus', 'tkn_times']:
+		op_conditional()
+		myvar()
+	elif token.id in ['tkn_minus']:
+		emparejar("tkn_minus")
+		expr_conditional()
+	elif token.id in ['TextWindow']:
+		write_sentence()
+	elif token.id in ['Array', 'False', 'Program', 'Stack', 'True', 'id', 'tkn_number', 'tkn_text']:
+		myvar()
+		expr_conditional1()
 	elif token.id in ['tkn_left_paren']:
 		emparejar("tkn_left_paren")
-		variable()
-		expresion11()
+		myvar()
+		expr_conditional11()
 	else:
-		errorSin(['tkn_left_paren', 'tkn_minus', 'False', 'id', 'tkn_text', 'True', 'tkn_number'])
-def expresion_condicion():
-	if token.id in ['False', 'True', 'id', 'tkn_number', 'tkn_text']:
-		variable()
-		expresion_condicion1()
-	elif token.id in ['tkn_left_paren']:
-		emparejar("tkn_left_paren")
-		variable()
-		expresion_condicion11()
+		errorSin(['tkn_less', 'tkn_plus', 'True', 'id', 'tkn_number', 'tkn_equals', 'tkn_div', 'tkn_greater', 'Stack', 'tkn_text', 'False', 'Array', 'tkn_left_paren', 'TextWindow', 'Program', 'tkn_diff', 'tkn_geq', 'tkn_minus', 'tkn_times', 'tkn_leq'])
+def expr_conditional1():
+	if token.id in ['tkn_diff', 'tkn_div', 'tkn_equals', 'tkn_geq', 'tkn_greater', 'tkn_leq', 'tkn_less', 'tkn_minus', 'tkn_plus', 'tkn_times']:
+		op_conditional()
+		expr_conditional()
+	elif token.id in ['And', 'Or']:
+		conector()
+		expr_conditional()
+	elif token.id in ['And', 'Array', 'For', 'Goto', 'If', 'Or', 'Program', 'Stack', 'Step', 'Sub', 'TextWindow', 'While', 'id', 'tkn_diff', 'tkn_div', 'tkn_equals', 'tkn_geq', 'tkn_greater', 'tkn_leq', 'tkn_less', 'tkn_minus', 'tkn_plus', 'tkn_right_paren', 'tkn_times']:
+		return
 	else:
-		errorSin(['tkn_left_paren', 'False', 'id', 'tkn_text', 'True', 'tkn_number'])
-def texto():
-	if token.id in ['False', 'True', 'id', 'tkn_number', 'tkn_text']:
-		variable()
-		texto_aux()
+		errorSin(['tkn_less', 'tkn_plus', 'id', 'tkn_equals', 'Or', 'tkn_div', 'While', 'tkn_greater', 'Stack', 'Sub', 'For', 'Array', 'Step', 'And', 'If', 'tkn_right_paren', 'TextWindow', 'Goto', 'Program', 'tkn_diff', 'tkn_geq', 'tkn_minus', 'tkn_times', 'tkn_leq'])
+def text():
+	if token.id in ['Array', 'False', 'Program', 'Stack', 'True', 'id', 'tkn_number', 'tkn_text']:
+		myvar()
+		temp_text()
 	else:
-		errorSin(['False', 'id', 'tkn_text', 'True', 'tkn_number'])
-def texto_aux():
+		errorSin(['tkn_text', 'False', 'True', 'id', 'tkn_number', 'Array', 'Program', 'Stack'])
+def temp_text():
 	if token.id in ['tkn_plus']:
 		emparejar("tkn_plus")
-		variable()
-		texto_aux()
+		myvar()
+		temp_text()
 	elif token.id in ['tkn_right_paren']:
 		return
 	else:
-		errorSin(['tkn_right_paren', 'tkn_plus'])
-def variable():
+		errorSin(['tkn_plus', 'tkn_right_paren'])
+def myvar():
 	if token.id in ['id']:
 		emparejar("id")
-		variable_aux()
+		temp_var()
+	elif token.id in ['Array', 'Program', 'Stack']:
+		builtin_declare()
 	elif token.id in ['tkn_number']:
 		emparejar("tkn_number")
 	elif token.id in ['True']:
@@ -421,24 +463,24 @@ def variable():
 	elif token.id in ['tkn_text']:
 		emparejar("tkn_text")
 	else:
-		errorSin(['False', 'id', 'tkn_text', 'True', 'tkn_number'])
-def variable_aux():
+		errorSin(['tkn_text', 'True', 'False', 'tkn_number', 'id', 'Array', 'Program', 'Stack'])
+def temp_var():
 	if token.id in ['tkn_left_brac']:
 		emparejar("tkn_left_brac")
-		variable()
+		myvar()
 		emparejar("tkn_right_brac")
-	elif token.id in ['$', 'And', 'Array', 'Else', 'ElseIf', 'EndFor', 'EndIf', 'EndSub', 'EndWhile', 'For', 'Goto', 'If', 'Or', 'Program', 'Stack', 'Sub', 'TextWindow', 'While', 'id', 'tkn_comma', 'tkn_diff', 'tkn_div', 'tkn_geq', 'tkn_greater', 'tkn_leq', 'tkn_less', 'tkn_minus', 'tkn_plus', 'tkn_right_brac', 'tkn_right_paren', 'tkn_times']:
+	elif token.id in ['$', 'And', 'Array', 'Else', 'ElseIf', 'EndFor', 'EndIf', 'EndSub', 'EndWhile', 'For', 'Goto', 'If', 'Or', 'Program', 'Stack', 'Step', 'Sub', 'TextWindow', 'To', 'While', 'id', 'tkn_comma', 'tkn_diff', 'tkn_div', 'tkn_equals', 'tkn_geq', 'tkn_greater', 'tkn_leq', 'tkn_less', 'tkn_minus', 'tkn_plus', 'tkn_right_brac', 'tkn_right_paren', 'tkn_times']:
 		return
 	else:
-		errorSin(['tkn_left_brac', 'Else', 'Sub', 'TextWindow', 'tkn_times', 'tkn_right_paren', 'tkn_div', 'ElseIf', 'tkn_right_brac', 'tkn_minus', 'And', 'EndWhile', 'Goto', 'tkn_geq', 'Or', 'EndSub', 'tkn_plus', 'Stack', 'While', 'id', 'tkn_greater', 'EndIf', 'Program', 'tkn_leq', 'Array', '$', 'tkn_diff', 'tkn_less', 'If', 'EndFor', 'For', 'tkn_comma'])
+		errorSin(['tkn_leq', 'tkn_less', 'tkn_plus', 'ElseIf', 'id', 'tkn_equals', 'Or', 'tkn_div', 'tkn_greater', 'Stack', 'Sub', 'EndIf', 'EndWhile', '$', 'EndFor', 'For', 'Array', 'tkn_right_brac', 'Step', 'And', 'If', 'tkn_comma', 'tkn_left_brac', 'tkn_right_paren', 'TextWindow', 'Goto', 'Program', 'Else', 'tkn_diff', 'tkn_geq', 'To', 'tkn_minus', 'tkn_times', 'While', 'EndSub'])
 def conector():
 	if token.id in ['And']:
 		emparejar("And")
 	elif token.id in ['Or']:
 		emparejar("Or")
 	else:
-		errorSin(['Or', 'And'])
-def operador():
+		errorSin(['And', 'Or'])
+def op():
 	if token.id in ['tkn_plus']:
 		emparejar("tkn_plus")
 	elif token.id in ['tkn_minus']:
@@ -458,8 +500,8 @@ def operador():
 	elif token.id in ['tkn_greater']:
 		emparejar("tkn_greater")
 	else:
-		errorSin(['tkn_leq', 'tkn_plus', 'tkn_minus', 'tkn_geq', 'tkn_greater', 'tkn_diff', 'tkn_times', 'tkn_less', 'tkn_div'])
-def operador_condicion():
+		errorSin(['tkn_leq', 'tkn_less', 'tkn_plus', 'tkn_minus', 'tkn_times', 'tkn_div', 'tkn_diff', 'tkn_greater', 'tkn_geq'])
+def op_conditional():
 	if token.id in ['tkn_leq']:
 		emparejar("tkn_leq")
 	elif token.id in ['tkn_geq']:
@@ -468,99 +510,74 @@ def operador_condicion():
 		emparejar("tkn_less")
 	elif token.id in ['tkn_greater']:
 		emparejar("tkn_greater")
+	elif token.id in ['tkn_equals']:
+		emparejar("tkn_equals")
+	elif token.id in ['tkn_plus']:
+		emparejar("tkn_plus")
+	elif token.id in ['tkn_times']:
+		emparejar("tkn_times")
+	elif token.id in ['tkn_minus']:
+		emparejar("tkn_minus")
+	elif token.id in ['tkn_div']:
+		emparejar("tkn_div")
+	elif token.id in ['tkn_diff']:
+		emparejar("tkn_diff")
 	else:
-		errorSin(['tkn_less', 'tkn_leq', 'tkn_geq', 'tkn_greater'])
-def funcion_built_in1():
-	if token.id in ['id']:
-		emparejar("id")
-		emparejar("tkn_right_paren")
-	elif token.id in ['tkn_number']:
-		emparejar("tkn_number")
-		emparejar("tkn_right_paren")
-	else:
-		errorSin(['tkn_number', 'id'])
-def sentencia_de_asignacion1():
+		errorSin(['tkn_div', 'tkn_less', 'tkn_plus', 'tkn_minus', 'tkn_times', 'tkn_equals', 'tkn_leq', 'tkn_diff', 'tkn_greater', 'tkn_geq'])
+def assign_sentence1():
 	if token.id in ['tkn_equals']:
 		emparejar("tkn_equals")
-		otra_sentencia()
+		temp_sentence()
 	elif token.id in ['tkn_colon']:
 		emparejar("tkn_colon")
 	elif token.id in ['tkn_left_brac']:
 		emparejar("tkn_left_brac")
-		variable()
+		myvar()
 		emparejar("tkn_right_brac")
-		continuar_array()
+		array_continue()
 	elif token.id in ['tkn_left_paren']:
 		emparejar("tkn_left_paren")
 		emparejar("tkn_right_paren")
 	else:
-		errorSin(['tkn_equals', 'tkn_left_paren', 'tkn_left_brac', 'tkn_colon'])
-def sentencia_escritura1():
-	if token.id in ['False', 'True', 'id', 'tkn_number', 'tkn_text']:
-		texto()
+		errorSin(['tkn_left_brac', 'tkn_equals', 'tkn_colon', 'tkn_left_paren'])
+def write_sentence1():
+	if token.id in ['Array', 'False', 'Program', 'Stack', 'True', 'id', 'tkn_number', 'tkn_text']:
+		text()
 		emparejar("tkn_right_paren")
 	elif token.id in ['id']:
 		emparejar("id")
 		emparejar("tkn_right_paren")
+	elif token.id in ['Array', 'False', 'Program', 'Stack', 'TextWindow', 'True', 'id', 'tkn_left_paren', 'tkn_minus', 'tkn_number', 'tkn_text']:
+		expr()
+		emparejar("tkn_right_paren")
 	elif token.id in ['tkn_right_paren']:
 		emparejar("tkn_right_paren")
 	else:
-		errorSin(['tkn_right_paren', 'False', 'id', 'tkn_text', 'True', 'tkn_number'])
-def sentencia_for1():
+		errorSin(['tkn_text', 'tkn_minus', 'False', 'True', 'id', 'tkn_number', 'Array', 'TextWindow', 'Program', 'tkn_left_paren', 'tkn_right_paren', 'Stack'])
+def for_sentence1():
 	if token.id in ['Array', 'For', 'Goto', 'If', 'Program', 'Stack', 'Sub', 'TextWindow', 'While', 'id']:
-		sentencias()
+		sentences()
 		emparejar("EndFor")
 	elif token.id in ['Step']:
 		emparejar("Step")
-		emparejar("tkn_number")
-		sentencias()
+		expr()
+		sentences()
 		emparejar("EndFor")
 	else:
-		errorSin(['Array', 'Goto', 'Stack', 'While', 'Sub', 'TextWindow', 'id', 'Step', 'If', 'Program', 'For'])
-def expresion1():
-	if token.id in ['tkn_diff', 'tkn_div', 'tkn_geq', 'tkn_greater', 'tkn_leq', 'tkn_less', 'tkn_minus', 'tkn_plus', 'tkn_times']:
-		operador()
-		expresion()
+		errorSin(['Sub', 'If', 'For', 'id', 'Array', 'Goto', 'Program', 'TextWindow', 'While', 'Step', 'Stack'])
+def expr_conditional11():
+	if token.id in ['tkn_diff', 'tkn_div', 'tkn_equals', 'tkn_geq', 'tkn_greater', 'tkn_leq', 'tkn_less', 'tkn_minus', 'tkn_plus', 'tkn_times']:
+		op_conditional()
+		expr_conditional()
+		expr_conditional1()
+		emparejar("tkn_right_paren")
+		expr_conditional1()
 	elif token.id in ['And', 'Or']:
 		conector()
-		expresion()
-	elif token.id in ['$', 'Array', 'Else', 'ElseIf', 'EndFor', 'EndIf', 'EndSub', 'EndWhile', 'For', 'Goto', 'If', 'Program', 'Stack', 'Sub', 'TextWindow', 'While', 'id', 'tkn_right_paren']:
-		return
-	else:
-		errorSin(['Else', 'Sub', 'TextWindow', 'tkn_times', 'tkn_right_paren', 'tkn_div', 'ElseIf', 'tkn_minus', 'And', 'EndWhile', 'Goto', 'tkn_geq', 'Or', 'EndSub', 'tkn_plus', 'Stack', 'While', 'tkn_greater', 'id', 'EndIf', 'Program', 'tkn_leq', 'Array', '$', 'tkn_diff', 'tkn_less', 'If', 'EndFor', 'For'])
-def expresion11():
-	if token.id in ['tkn_diff', 'tkn_div', 'tkn_geq', 'tkn_greater', 'tkn_leq', 'tkn_less', 'tkn_minus', 'tkn_plus', 'tkn_times']:
-		operador()
-		expresion()
-		emparejar("tkn_right_paren")
-	elif token.id in ['And', 'Or']:
-		conector()
-		expresion()
+		expr_conditional()
 		emparejar("tkn_right_paren")
 	else:
-		errorSin(['tkn_leq', 'tkn_plus', 'tkn_minus', 'And', 'tkn_geq', 'tkn_greater', 'Or', 'tkn_diff', 'tkn_less', 'tkn_times', 'tkn_div'])
-def expresion_condicion1():
-	if token.id in ['tkn_geq', 'tkn_greater', 'tkn_leq', 'tkn_less']:
-		operador_condicion()
-		expresion_condicion()
-	elif token.id in ['And', 'Or']:
-		conector()
-		expresion_condicion()
-	elif token.id in ['tkn_right_paren']:
-		return
-	else:
-		errorSin(['tkn_leq', 'And', 'tkn_geq', 'tkn_greater', 'Or', 'tkn_less', 'tkn_right_paren'])
-def expresion_condicion11():
-	if token.id in ['tkn_geq', 'tkn_greater', 'tkn_leq', 'tkn_less']:
-		operador_condicion()
-		expresion_condicion()
-		emparejar("tkn_right_paren")
-	elif token.id in ['And', 'Or']:
-		conector()
-		expresion_condicion()
-		emparejar("tkn_right_paren")
-	else:
-		errorSin(['tkn_leq', 'And', 'tkn_geq', 'tkn_greater', 'Or', 'tkn_less'])
+		errorSin(['tkn_leq', 'And', 'tkn_less', 'tkn_plus', 'tkn_minus', 'tkn_times', 'tkn_equals', 'Or', 'tkn_div', 'tkn_diff', 'tkn_greater', 'tkn_geq'])
 
 token = allmytokens[ITERATOR]
 INICIO()
